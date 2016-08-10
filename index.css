@@ -1,0 +1,28 @@
+body {
+	background-color: lightblue;
+	font-family: "Arial", Georgia, Serif;
+}
+
+h1 {
+	color: darkred;
+	margin-left: 5%;
+	font-size: 24;
+	/*font-family: "Arial", Georgia, Serif;*/
+}
+
+p {
+	text-align: left;
+	padding-left: 10px;
+}
+
+table#chart tr:nth-child(even) {
+    background-color: #eee;
+}
+
+table#chart tr:nth-child(odd) {
+   background-color:#fff;
+}
+
+td {
+	border: 2px solid black;
+}

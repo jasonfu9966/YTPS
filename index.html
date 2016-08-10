@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="index.css">
+	<title>Youtube Video Pitch Shifter</title>
+</head>
+<body>
+
+<div>
+<h1>Youtube Video Pitch Shifter</h1>
+</div>
+<div>
+<p>Currently accepting Youtube links in two formats: </p>
+<ul><li>http://youtube.com/watch?v=_________</li>
+<li>http://youtu.be/_________</li></ul>
+
+<p>Please make sure your link is in one of these two formats before submitting. Do not submit embed URLs.</p>
+<p>After submitting the Youtube link, please give the system a few minutes to download and convert the video into an audio file. </p>
+<p>Press "play" after choosing your transposition.</p>
+<p>Also, please only use the audio controls in the left box.</p>
+<p>This site uses cookies to keep track of your previous searches.</p>
+</div>
+
+<div class="mainContentWrapper">
+	<table style="width:70%" align="center"> 
+		<tr><td>
+		<div id="inputArea">
+			<div id="label">
+				Enter your Youtube link here:	
+			</div>
+			<div>
+				<input type="textbox" id="youtubeLinkBox">
+				<button type="button" id="linkbox" onclick="loadVideo()">Submit</button>
+			</div>
+		</div></td>
+		<td>
+		<div id = "selectionRadioWrapper">
+			<div id="semitonesWrapper">
+				Shift up/down by <input type="textbox" id="semitonesBox" size="3"> semitones / halfsteps
+			</div>
+			
+		</div>
+		<td>
+			<div id="calculatorWrapper">
+					<table><tr><th>Semitone calculator</th></tr>
+					<tr><td>Original Key:</td>
+					<td>Desired Key:</td>
+					<td><button id="calculatorButton" onclick="calcSemitone()">Calculate</button></td></tr>
+					<tr><td><select id="origKey">
+						<option value="-1">--</option>
+						<option value="0">C</option>
+						<option value="1">C#/Eb</option>
+						<option value="2">D</option>
+						<option value="3">D#/Eb</option>
+						<option value="4">E</option>
+						<option value="5">F</option>
+						<option value="6">F#/Gb</option>
+						<option value="7">G</option>
+						<option value="8">G#/Ab</option>
+						<option value="9">A</option>
+						<option value="10">A#/Bb</option>
+						<option value="11">B</option>
+					</select>
+					</td>
+					<td><select id="desKey">
+						<option value="-1">--</option>
+						<option value="0">C</option>
+						<option value="1">C#/Eb</option>
+						<option value="2">D</option>
+						<option value="3">D#/Eb</option>
+						<option value="4">E</option>
+						<option value="5">F</option>
+						<option value="6">F#/Gb</option>
+						<option value="7">G</option>
+						<option value="8">G#/Ab</option>
+						<option value="9">A</option>
+						<option value="10">A#/Bb</option>
+						<option value="11">B</option>
+					</select>
+					</td>
+					<td><input type="textbox" id="calcResult" size=7></td></tr>
+					</table>
+			</div>
+		</td>
+		</tr>
+		<tr>	
+			<td>
+				audio controls will go here
+			</td>
+			<td><div id="player">
+				<!--iframe and player will replace this div.-->
+				Embedded Youtube video will go here.
+			</div></td>
+		</tr>
+	</table>
+</div>
+
+<div id="referencesContainer">
+<div id="chartTitle"><h3>Semitone (half-step) Transposition Chart</h3></div>
+	<button id="showHideChart" onclick="showHideChart()">Show/Hide</button>
+	<div id="transpositionChart">
+	<!--gets created in js-->
+	</div>
+</div>
+
+<iframe src="yt.php" border="0" frameborder="0" height="80"></iframe>
+
+
+<script>
+
+	//downloads the necessary libraries to embed a youtube video.
+	var tag = document.createElement('script');
+	tag.src = "https://www.youtube.com/iframe_api";
+	var firstScriptTag = document.getElementsByTagName('script')[0];
+	firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+	//creates the player
+	var player;
+    function onYouTubeIframeAPIReady() {
+    	// player = new YT.Player('player', {
+    	// 	height: '390',
+    	// 	width: '640',
+    	// 	videoId: 'M7lc1UVf-VE',
+    	// 	events: {
+    	// 		'onReady': onPlayerReady,
+    	// 		'onStateChange': onPlayerStateChange
+    	// 	}
+    	// });
+    }
+
+	//The API will call this function when the video player is ready.
+	function onPlayerReady(event) {
+		event.target.playVideo();
+	}
+
+	function loadVideo() {
+		var vidURL = $('#linkbox').val();
+		loadVideobyUrl(vidURL);
+	}
+
+	function loadVideobyUrl(vidURL) {
+		var vidURL = vidURL + "?version=3";
+		player = new YT.player('player', {
+			height: '390',
+			width: '640',
+			events: {
+				'onReady' : pauseVideo
+			}
+		});
+		
+	}
+
+    function pauseVideo(){
+    	player.pauseVideo();
+    }
+
+	function createTranspositionChart() {
+		var notes = ["C","C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"];
+		var start = 24;
+		var retVal  = "<table id=\"chart\">";
+		while (start !== -1) {
+			
+			//first column
+			retVal += "<tr><td><b>";
+			var firstCol = start - 12;
+			if (firstCol > 0)
+				retVal += "+";
+			retVal += firstCol + "</b></td>";
+
+			//all the following columns
+			for (var i = 0; i < notes.length; i++) {
+				retVal += "<td>";
+				retVal += notes[(i + start) % notes.length];
+				retVal += "</td>";
+			}
+
+			retVal += "</tr>";
+			start--;
+		}
+		retVal += "</table>";
+		$('#transpositionChart').html(retVal);
+	}
+
+	function showHideChart() {
+		$('#transpositionChart').toggle();
+	}
+
+	function calcSemitone() {
+		var origKey = $('#origKey option:selected').val(); 
+		var desKey = $('#desKey option:selected').val();
+		if (origKey === "-1" || desKey === "-1") {
+			alert('Please select both keys.');
+		} else {
+			var res = desKey - origKey;
+			if (res < -6)
+				res += 12;
+			else if (res > 6)
+				res -= 12;
+			$('#calcResult').val(res);
+		}
+	}
+
+
+	$(function() { //document.ready
+		createTranspositionChart();
+		showHideChart();
+	});
+
+
+</script>
+
+</body>
+</html>
