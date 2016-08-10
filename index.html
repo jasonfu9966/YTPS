@@ -19,7 +19,7 @@
 
 <p>Please make sure your link is in one of these two formats before submitting. Do not submit embed URLs.</p>
 <p>After submitting the Youtube link, please give the system a few minutes to download and convert the video into an audio file. </p>
-<p>Press "play" after choosing your transposition.</p>
+<p>Press "play" after putting your key change in the box.</p>
 <p>Also, please only use the audio controls in the left box.</p>
 <p>This site uses cookies to keep track of your previous searches.</p>
 </div>
@@ -83,6 +83,7 @@
 					</td>
 					<td><input type="textbox" id="calcResult" size=7></td></tr>
 					</table>
+					<div id="calcError">Please select both keys.</div>
 			</div>
 		</td>
 		</tr>
@@ -188,12 +189,23 @@
 		$('#transpositionChart').toggle();
 	}
 
+	function showCalcError() {
+		$('#calcError').show();
+	}
+
+	function hideCalcError() {
+		$('#calcError').hide();
+	}
+
+
 	function calcSemitone() {
 		var origKey = $('#origKey option:selected').val(); 
 		var desKey = $('#desKey option:selected').val();
 		if (origKey === "-1" || desKey === "-1") {
-			alert('Please select both keys.');
+			showCalcError();
+			$('#calcResult').val("");
 		} else {
+			hideCalcError();
 			var res = desKey - origKey;
 			if (res < -6)
 				res += 12;
@@ -207,6 +219,7 @@
 	$(function() { //document.ready
 		createTranspositionChart();
 		showHideChart();
+		hideCalcError();
 	});
 
 
