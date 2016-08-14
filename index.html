@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="/scripts/nouislider.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="index.css">
 	<title>Youtube Video Pitch Shifter</title>
 </head>
@@ -32,8 +33,14 @@
 				Enter your Youtube link here:	
 			</div>
 			<div>
-				<input type="textbox" id="youtubeLinkBox">
+				<input type="url" id="youtubeLinkBox">
 				<button type="button" id="linkbox" onclick="loadVideo()">Submit</button>
+			</div>
+			<div id="label">
+				or upload a file here:
+			</div>
+			<div>
+				<input type="file">
 			</div>
 		</div></td>
 		<td>
@@ -107,9 +114,6 @@
 	</div>
 </div>
 
-<!--<iframe src="yt.php" border="0" frameborder="0" height="80"></iframe>-->
-
-
 <script>
 
 	//downloads the necessary libraries to embed a youtube video.
@@ -143,7 +147,7 @@
 	}
 
 	function loadVideobyUrl(vidURL) {
-		var vidURL += "?version=3";
+		var vidURL = vidURL + "?version=3";
 		player = new YT.player('player', {
 			height: '390',
 			width: '640',
@@ -189,23 +193,14 @@
 		$('#transpositionChart').toggle();
 	}
 
-	function showCalcError() {
-		$('#calcError').show();
-	}
-
-	function hideCalcError() {
-		$('#calcError').hide();
-	}
-
-
 	function calcSemitone() {
 		var origKey = $('#origKey option:selected').val(); 
 		var desKey = $('#desKey option:selected').val();
 		if (origKey === "-1" || desKey === "-1") {
-			showCalcError();
+			$('#calcError').show();
 			$('#calcResult').val("");
 		} else {
-			hideCalcError();
+			$('#calcError').hide();
 			var res = desKey - origKey;
 			if (res < -6)
 				res += 12;
@@ -219,7 +214,7 @@
 	$(function() { //document.ready
 		createTranspositionChart();
 		showHideChart();
-		hideCalcError();
+		$('#calcError').hide();
 	});
 
 
