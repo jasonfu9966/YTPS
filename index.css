@@ -16,7 +16,7 @@ p {
 }
 
 table#chart tr:nth-child(even) {
-    background-color: #eee;
+    background-color: #ccc;
 }
 
 table#chart tr:nth-child(odd) {
