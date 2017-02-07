@@ -1,5 +1,7 @@
 //Hello there. If you are reading this, please give me money.
-var noteValues = {
+
+//declarations!
+const noteValues = {
 	"--": -1,
 	"C": 0,
 	"C#/Db": 1,
@@ -15,6 +17,10 @@ var noteValues = {
 	"B": 11
 };
 
+
+/**********
+	Youtube Video controls
+	            **********/
 //downloads the necessary libraries to embed a youtube video.
 var tag = document.createElement('script');
 tag.src = "https://www.youtube.com/iframe_api";
@@ -61,8 +67,35 @@ function pauseVideo(){
 	player.pauseVideo();
 }
 
-function createTranspositionChart() {
-	var notes = ["C","C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"];
+
+/**********
+	Pitch Shifter Controls
+	            **********/
+
+function __log(e, data) {
+	var toAppend = "\n" + e + " " + (data || '');
+	$('#log').append(toAppend);
+}
+
+var audio_context;
+var recorder;
+
+function startUserMedia(stream) {
+	var input = audio_context.createMediaStreamSource(stream);
+	__log('Media stream created.');
+	recorder = new Recorder(input);
+	__log('Recorder initialized.');
+}
+
+/**********
+	The rest of it
+	            **********/
+function createTranspositionChart(noteValues) {
+	// pulling the "data" from the const obj, declared at the top
+	var notes = Object.keys(noteValues);	//pulls just the keys from the obj
+	notes = notes.slice(1);   //cutting off the first index of the array (which is --)
+	//console.log(notes);     // this should output:
+	//["C","C#/Db", "D", "D#/Eb", "E", "F", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B"];
 	var start = 24;
 	var retVal  = "<table id=\"chart\">";
 	while (start !== -1) {
@@ -92,15 +125,15 @@ function showHideChart() {
 	$('#transpositionChart').toggle();
 }
 
-function calcSemitone() {
-	var origKey = noteValues[$('#origKey option:selected')]; 
-	var desKey = noteValues[$('#desKey option:selected')];
+function calcSemitone(origKey, desKey) {
+	// var origKey = noteValues[$('#origKey option:selected')]; 
+	// var desKey = noteValues[$('#desKey option:selected')];
 	if (origKey === "-1" || desKey === "-1") {
 		$('#calcError').show();
 		$('#calcResult').val("");
 	} else {
-		console.log("origKey: " + origKey);
-		console.log("desKey: " + desKey);
+		console.log("calcSemitone origKey: " + origKey);
+		console.log("calcSemitone desKey: " + desKey);
 		$('#calcError').hide();
 		var res = desKey - origKey;
 		if (res < -6)
@@ -110,7 +143,6 @@ function calcSemitone() {
 		$('#calcResult').val(res);
 	}
 }
-
 
 //for populating the dropdowns of the calculator
 function populateDropdowns() {
@@ -132,7 +164,17 @@ function populateDropdowns() {
 }
 
 $(function() { //document.ready
-	createTranspositionChart();
+	
+	//this doesn't work
+	$('#calculatorButton').on('click', function() {
+		var orig = $('#origKey option:selected');
+		console.log('onclick orig: ' + orig);
+		var des = $('#desKey option:selected');
+		console.log('onclick des: ' + des);
+		calcSemitone(noteValues[orig], noteValues[des]);
+	});
+
+	createTranspositionChart(noteValues);	//noteValues is declared at the top
 	showHideChart();
 	populateDropdowns();
 	$('#calcError').hide();
